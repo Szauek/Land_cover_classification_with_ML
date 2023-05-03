@@ -40,3 +40,25 @@ head(extr)
 set.seed(100)
 trainids <- createDataPartition(extr$ID,list=FALSE,p=0.05)
 trainDat <- extr[trainids,]
+
+predictors <- names(main_data)
+response <- "Label"
+
+indices <- CreateSpacetimeFolds(trainDat,spacevar = "ID",k=3,class="typ")
+ctrl <- trainControl(method="cv", 
+                     index = indices$index,
+                     savePredictions = TRUE)
+#View(extr)
+
+# train the model
+set.seed(100)
+model <- ffs(trainDat[,predictors],
+             trainDat[,response],
+             method="rf",
+             metric="Kappa",
+             trControl=ctrl,
+             importance=TRUE,
+             ntree=75)
+
+print(model)
+plot(varImp(model))
