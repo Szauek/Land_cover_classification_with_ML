@@ -42,8 +42,7 @@ trainids <- createDataPartition(extr$ID,list=FALSE,p=0.05)
 trainDat <- extr[trainids,]
 
 predictors <- names(main_data)
-response <- "Label"
-
+response <- "typ"
 indices <- CreateSpacetimeFolds(trainDat,spacevar = "ID",k=3,class="typ")
 ctrl <- trainControl(method="cv", 
                      index = indices$index,
@@ -51,6 +50,14 @@ ctrl <- trainControl(method="cv",
 #View(extr)
 
 # train the model
+model <- train(trainDat[,predictors],
+               trainDat[,response],
+               method="rf",
+               ntree=75)
+model
+
+model <-  train(trainDat[,predictors],trainDat[,response])
+
 set.seed(100)
 model <- ffs(trainDat[,predictors],
              trainDat[,response],
@@ -62,3 +69,22 @@ model <- ffs(trainDat[,predictors],
 
 print(model)
 plot(varImp(model))
+
+cvPredictions <- model$pred[model$pred$mtry==model$bestTune$mtry,]
+table(cvPredictions$pred,cvPredictions$obs)
+
+prediction <- predict(main_data,model)
+cols <- rev(c("palegreen", "grey", "blue", "forestgreen", "brown","beige","yellowgreen"))
+AOA <- aoa(main_data,model)
+tm_shape(prediction) +
+  tm_raster(palette = cols,title = "LUC")+
+  tm_scale_bar(bg.color="white",bg.alpha=0.75)+
+  tm_layout(legend.bg.color = "white",
+            legend.bg.alpha = 0.75)
+
+AOA <- aoa(main_data,model)
+plot(AOA$AOA)
+plot(AOA$DI)
+plot(AOA$parameters)
+
+predplot <- spplot(deratify(cvPredictions),col.regions=cols, main = list(label="Prediction (left), prediction only for the AOA (right) and RGB composite (bottom)",cex=0.8))
