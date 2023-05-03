@@ -7,6 +7,9 @@ library(sf)
 library(CAST)
 library(tmap)
 library(terra)
+library(lattice)
+library(latticeExtra)
+library(gridExtra)
 
 # Dane pobrane z EO Browser, Sentinel 2 o danych (...), Utworzono raster stack
 #
@@ -42,17 +45,17 @@ trainids <- createDataPartition(extr$ID,list=FALSE,p=0.05)
 trainDat <- extr[trainids,]
 
 predictors <- names(main_data)
-response <- "Label"
+response <- "typ"
 
 indices <- CreateSpacetimeFolds(trainDat,spacevar = "ID",k=3,class="typ")
 ctrl <- trainControl(method="cv", 
                      index = indices$index,
                      savePredictions = TRUE)
 #View(extr)
-
+View(trainDat[,response])
 # train the model
 set.seed(100)
-model <- ffs(trainDat[,predictors],
+model <- train(trainDat[,predictors],
              trainDat[,response],
              method="rf",
              metric="Kappa",
@@ -62,3 +65,35 @@ model <- ffs(trainDat[,predictors],
 
 print(model)
 plot(varImp(model))
+
+cvPredictions <- model$pred[model$pred$mtry==model$bestTune$mtry,]
+table(cvPredictions$pred,cvPredictions$obs)
+
+prediction <- predict(main_data,model)
+cols <- c("sandybrown", "green", "darkred", "blue", "forestgreen", "lightgreen", "red")
+
+tm_shape(deratify(prediction)) +
+  tm_raster(palette = cols,title = "LUC")+
+  tm_scale_bar(bg.color="white",bg.alpha=0.75)+
+  tm_layout(legend.bg.color = "white",
+            legend.bg.alpha = 0.75)
+
+
+AOA <-  aoa(main_data,model, method = "L2")
+plot(AOA)
+spplot(AOA$AOA,main="Area of Applicability")
+
+predplot <- spplot(deratify(prediction), col.regions=cols, main = list(label="Prediction (left), prediction only for the AOA (right) and RGB composite (bottom)",cex=0.8))
+#predplotaoa <- spplot(deratify(prediction), col.regions=cols)+
+ # spplot(AOA$AOA,col.regions=c("grey","transparent"))
+
+#spplot(deratify(prediction), col.regions=cols,maxpixels=ncell(prediction))+
+ # spplot(AOA$AOA,col.regions=c("grey","transparent"))
+
+predplotaoa <- spplot(deratify(prediction), col.regions=cols)
+aoaplot <- spplot(AOA$AOA,col.regions=c("grey","transparent"))
+
+grid.arrange(predplotaoa, aoaplot, ncol=2)
+
+latticeCombineGrid(list(predplot,predplotaoa,rgbplot_ms),layout=c(2,2))
+
