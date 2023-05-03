@@ -24,3 +24,19 @@ plotRGB(main_data, stretch ="lin", r = 3, g = 2, b = 1)
 
 #nalezy wczytac warstwe z poligonami, ktore posluza jako warstwy treningowe
 
+trainSites <- read_sf("data/trainFields2.gpkg")
+print(trainSites)
+
+viewRGB(main_data, r = 3, g = 2, b = 1, map.types = "Esri.WorldImagery")+
+  mapview(trainSites)
+
+extr <- extract(main_data, trainSites, df=TRUE)
+
+#head(extr$ID)
+
+extr <- merge(extr, trainSites, by.x="ID", by.y="ID")
+head(extr)
+
+set.seed(100)
+trainids <- createDataPartition(extr$ID,list=FALSE,p=0.05)
+trainDat <- extr[trainids,]
