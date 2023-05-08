@@ -1,0 +1,26 @@
+[general]
+creator=R package 'raster'
+created=2023-05-04 21:24:15
+[data]
+datatype=FLT4S
+byteorder=little
+nbands=15
+bandorder=BIL
+minvalue=0:1514:1009:813:334:0:577:557:0:0:17695:0:2523:3785:0
+maxvalue=54840:41516:42342:35140:34177:38934:47552:38371:39563:65535:64225:60293:63668:63515:65535
+nodatavalue=-3.4e+38
+[legend]
+legendtype=
+values=
+color=
+[description]
+layername=B02:B03:B04:B05:B06:B07:B08:B09:B8A:layer.1:layer.2:layer.3:layer.4:layer.5:layer.6
+[georeference]
+nrows=906
+ncols=1795
+xmin=2431547.86140828
+ymin=6727471.27972029
+xmax=2449501.00842676
+ymax=6736538.62220062
+projection=+proj=merc +a=6378137 +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null +wktext +no_defs
+wkt=PROJCRS["WGS 84 / Pseudo-Mercator",    BASEGEOGCRS["WGS 84",        DATUM["World Geodetic System 1984",            ELLIPSOID["WGS 84",6378137,298.257223563,                LENGTHUNIT["metre",1]]],        PRIMEM["Greenwich",0,            ANGLEUNIT["degree",0.0174532925199433]],        ID["EPSG",4326]],    CONVERSION["unnamed",        METHOD["Popular Visualisation Pseudo Mercator",            ID["EPSG",1024]],        PARAMETER["Latitude of natural origin",0,            ANGLEUNIT["degree",0.0174532925199433],            ID["EPSG",8801]],        PARAMETER["Longitude of natural origin",0,            ANGLEUNIT["degree",0.0174532925199433],            ID["EPSG",8802]],        PARAMETER["False easting",0,            LENGTHUNIT["metre",1],            ID["EPSG",8806]],        PARAMETER["False northing",0,            LENGTHUNIT["metre",1],            ID["EPSG",8807]]],    CS[Cartesian,2],        AXIS["(E)",east,            ORDER[1],            LENGTHUNIT["metre",1,                ID["EPSG",9001]]],        AXIS["(N)",north,            ORDER[2],            LENGTHUNIT["metre",1,                ID["EPSG",9001]]]]
