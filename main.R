@@ -40,7 +40,9 @@ head(extr)
 set.seed(100)
 trainids <- createDataPartition(extr$ID,list=FALSE,p=0.05)
 trainDat <- extr[trainids,]
-
+# metoda cv czyli cross validacja, sluzy do lepszego przewidywania zmian
+# zamiast na wszystkich zmiennych, model uczy się jedynie na polu treningowym
+# Zapewnia większą pewność, by model lepiej pracował
 predictors <- names(main_data)
 response <- "typ"
 indices <- CreateSpacetimeFolds(trainDat,spacevar = "ID",k=3,class="typ")
@@ -68,11 +70,13 @@ model <- ffs(trainDat[,predictors],
              ntree=75)
 
 print(model)
+plot(model)
 plot(varImp(model))
 
+#proba przewidzenia
 cvPredictions <- model$pred[model$pred$mtry==model$bestTune$mtry,]
 table(cvPredictions$pred,cvPredictions$obs)
-
+# 
 prediction <- predict(main_data,model)
 cols <- rev(c("palegreen", "grey", "blue", "forestgreen", "brown","beige","yellowgreen"))
 AOA <- aoa(main_data,model)
@@ -83,8 +87,12 @@ tm_shape(prediction) +
             legend.bg.alpha = 0.75)
 
 AOA <- aoa(main_data,model)
+plot(AOA)
 plot(AOA$AOA)
 plot(AOA$DI)
 plot(AOA$parameters)
 
-predplot <- spplot(deratify(cvPredictions),col.regions=cols, main = list(label="Prediction (left), prediction only for the AOA (right) and RGB composite (bottom)",cex=0.8))
+predplot <- spplot(deratify(predictions),col.regions=cols, main = list(label="Prediction (left), prediction only for the AOA (right) and RGB composite (bottom)",cex=0.8))
+predplotaoa <- spplot(deratify(prediction),col.regions=cols)+
+spplot(AOA$AOA,col.regions=c("grey", "transparent"))
+latticeExtra::CombineGrid(list(predplot,predplotaoa,rgbplot_main_data), layout=c(2,2))
