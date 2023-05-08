@@ -117,31 +117,35 @@ table(cvPredictions20$pred,cvPredictions20$obs)
 prediction40 <- predict(main_data,model40)
 prediction20 <- predict(main_data,model20)
 cols <- rev(c("palegreen", "grey", "blue", "forestgreen", "brown","beige","yellowgreen"))
-AOA <- aoa(main_data,model40)
+# kompozycja mapowa
 tm_shape(prediction40) +
   tm_raster(palette = cols,title = "Legenda")+
   tm_scale_bar(bg.color="white",bg.alpha=0.75)+
   tm_layout(legend.bg.color = "white",
             legend.bg.alpha = 0.75)
-
+# kompozycja mapowa
 tm_shape(prediction20) +
   tm_raster(palette = cols,title = "Legenda")+
   tm_scale_bar(bg.color="white",bg.alpha=0.75)+
   tm_layout(legend.bg.color = "white",
             legend.bg.alpha = 0.75)
 
+# model AOA
+AOA <- aoa(main_data,model20)
+
+# sprawdzenie wynikow
 plot(AOA)
 plot(AOA$AOA)
 plot(AOA$DI)
 plot(AOA$parameters)
 
+# przygotowanie wizualizacji mapowej
 predplot40 <- spplot(deratify(prediction40),col.regions=cols, main = list(label="Prediction 40",cex=0.8))
 predplot20 <- spplot(deratify(prediction20),col.regions=cols, main = list(label="Prediction 20",cex=0.8))
 
-predplotaoa <- spplot(deratify(prediction40),col.regions=cols)+
-spplot(AOA$AOA,col.regions=c("grey", "transparent"))
+# przygotowanie wizualizacji mapowej aoa
+predplotaoa <- spplot(deratify(prediction20),col.regions=cols)+
+spplot(AOA$AOA,col.regions=c("grey", "transparent"), main = list(label="Prediction AOA_20"))
 
-plot(predplot)
-plot(predplotaoa)
-
-grid.arrange(predplot40,predplot20)
+# Wyswietlenie wynikow
+grid.arrange(predplot40,predplot20, predplotaoa)
