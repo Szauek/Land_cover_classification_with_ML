@@ -61,41 +61,14 @@ trainDat20 <- extr20[trainids20,]
 predictors <- names(main_data)
 response <- "typ"
 indices40 <- CreateSpacetimeFolds(trainDat40,spacevar = "ID",k=3,class = "typ") #CAST
-ctrl <- trainControl(method="cv", 
+ctrl40 <- trainControl(method="cv", 
                      index = indices40$index,
                      savePredictions = TRUE)
 
 indices20 <- CreateSpacetimeFolds(trainDat20,spacevar = "ID",k=3,class="typ") #CAST
-ctrl <- trainControl(method="cv", 
+ctrl20 <- trainControl(method="cv", 
                      index = indices20$index,
                      savePredictions = TRUE)
-
-# Ustawienia trenowanego modelu, w oparciu o metodę RANDOM FORREST
-# Zwykła próba treningu modelu
-
-model40 <- train(trainDat40[,predictors],
-               trainDat40[,response],
-               method="rf",
-               ntree=75)
-
-# Wizualizacja danych
-print(model40)
-plot(model40)
-plot(varImp(model40))
-
-# Zwykła próba treningu modelu
-model20 <- train(trainDat20[,predictors],
-                 trainDat20[,response],
-                 method="rf",
-                 ntree=75)
-
-# Wizualizacja danych
-print(model20)
-plot(model20)
-plot(varImp(model20))
-
-# Ustawienie trenowanego modelu, domyślne ustawienia
-model40 <-  train(trainDat40[,predictors],trainDat40[,response])
 
 # Trenowanie modelu w oparciu o ffs z dodanym kontrolerem
 set.seed(100)
@@ -103,7 +76,7 @@ model40 <- ffs(trainDat40[,predictors],
              trainDat40[,response],
              method="rf",
              metric="Kappa",
-             trControl=ctrl,
+             trControl=ctrl40,
              importance=TRUE,
              ntree=60)
 
@@ -111,14 +84,12 @@ print(model40)
 plot(model40)
 plot(varImp(model40))
 
-model20 <-  train(trainDat20[,predictors],trainDat20[,response])
-
 set.seed(100)
 model20 <- ffs(trainDat20[,predictors],
                trainDat20[,response],
                method="rf",
                metric="Kappa",
-               trControl=ctrl,
+               trControl=ctrl20,
                importance=TRUE,
                ntree=60)
 
@@ -141,39 +112,42 @@ prediction40 <- predict(main_data,model40)
 prediction20 <- predict(main_data,model20)
 cols <- rev(c("palegreen", "grey", "blue", "forestgreen", "brown","beige","yellowgreen"))
 
-# Kompozycja mapowa
+# Kompozycja mapowa Sprawdzenie
 tm_shape(prediction40) +
-  tm_raster(palette = cols,title = "Legenda")+
+  tm_raster(palette = cols,title = "Legenda_40")+
   tm_scale_bar(bg.color="white",bg.alpha=0.75)+
   tm_layout(legend.bg.color = "white",
             legend.bg.alpha = 0.75)
 
 tm_shape(prediction20) +
-  tm_raster(palette = cols,title = "Legenda")+
+  tm_raster(palette = cols,title = "Legenda_20")+
   tm_scale_bar(bg.color="white",bg.alpha=0.75)+
   tm_layout(legend.bg.color = "white",
             legend.bg.alpha = 0.75)
 
 # Model AOA
-AOA <- aoa(main_data,model20)
+#model20 <-  train(trainDat20[,predictors],trainDat20[,response])
+#AOA <- aoa(main_data,model20)
 
 # Sprawdzenie wyników
-plot(AOA)
-plot(AOA$AOA)
-plot(AOA$DI)
-plot(AOA$parameters)
-
-# Przygotowanie wizualizacji mapowej
-predplot40 <- spplot(deratify(prediction40),col.regions=cols, main = list(label="Prediction 40",cex=0.8))
-predplot20 <- spplot(deratify(prediction20),col.regions=cols, main = list(label="Prediction 20",cex=0.8))
+#plot(AOA)
+#plot(AOA$AOA)
+#plot(AOA$DI)
+#plot(AOA$parameters)
 
 # Przygotowanie wizualizacji mapowej aoa
-predplotaoa <- spplot(deratify(prediction20),col.regions=cols)+
-spplot(AOA$AOA,col.regions=c("grey", "transparent"), main = list(label="Prediction AOA_20", cex = 1.5))
+
+#predplotaoa <- spplot((AOA$AOA),col.regions=c("yellowgreen", "beige"), main = list(label="Prediction AOA_20"))
+
+
+# Przygotowanie wizualizacji mapowej
+
+predplot40 <- spplot(deratify(prediction40),col.regions=cols, main = list(label="Prediction 40"))
+predplot20 <- spplot(deratify(prediction20),col.regions=cols, main = list(label="Prediction 20"))
 
 # Wyswietlenie mapy, w zakładce plot można będzie się szybciej przemieszczać
 
 plotRGB(main_data, stretch ="lin", r = 3, g = 2, b = 1)
 
 # Wyświetlenie wyników
-grid.arrange(predplot40,predplot20, predplotaoa, ncol = 2)
+grid.arrange(predplot20 ,predplot40, ncol = 2)
