@@ -21,3 +21,4 @@ library(terra)
 library(gridExtra)
 
 Badany obszar to obręb Władysławowa nad Morzem Bałtyckim.
+Pomoc w wykonania zadania, w oparciu o szkolenia Profesor Hanny Meyer.
