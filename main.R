@@ -71,32 +71,33 @@ ctrl <- trainControl(method="cv",
                      savePredictions = TRUE)
 
 # Ustawienia trenowanego modelu, w oparciu o metodę RANDOM FORREST
+# Zwykła próba treningu modelu
+
 model40 <- train(trainDat40[,predictors],
                trainDat40[,response],
                method="rf",
                ntree=75)
 
 # Wizualizacja danych
-model40
 print(model40)
 plot(model40)
 plot(varImp(model40))
 
+# Zwykła próba treningu modelu
 model20 <- train(trainDat20[,predictors],
                  trainDat20[,response],
                  method="rf",
                  ntree=75)
 
 # Wizualizacja danych
-model20
 print(model20)
 plot(model20)
 plot(varImp(model20))
 
-# Ustawienie trenowanego modelu, kolejny sposób
+# Ustawienie trenowanego modelu, domyślne ustawienia
 model40 <-  train(trainDat40[,predictors],trainDat40[,response])
 
-# Trenowanie modelu
+# Trenowanie modelu w oparciu o ffs z dodanym kontrolerem
 set.seed(100)
 model40 <- ffs(trainDat40[,predictors],
              trainDat40[,response],
@@ -104,7 +105,7 @@ model40 <- ffs(trainDat40[,predictors],
              metric="Kappa",
              trControl=ctrl,
              importance=TRUE,
-             ntree=75)
+             ntree=60)
 
 print(model40)
 plot(model40)
@@ -119,7 +120,7 @@ model20 <- ffs(trainDat20[,predictors],
                metric="Kappa",
                trControl=ctrl,
                importance=TRUE,
-               ntree=75)
+               ntree=60)
 
 print(model20)
 plot(model20)
@@ -170,5 +171,9 @@ predplot20 <- spplot(deratify(prediction20),col.regions=cols, main = list(label=
 predplotaoa <- spplot(deratify(prediction20),col.regions=cols)+
 spplot(AOA$AOA,col.regions=c("grey", "transparent"), main = list(label="Prediction AOA_20", cex = 1.5))
 
+# Wyswietlenie mapy, w zakładce plot można będzie się szybciej przemieszczać
+
+plotRGB(main_data, stretch ="lin", r = 3, g = 2, b = 1)
+
 # Wyświetlenie wyników
-grid.arrange(predplot40,predplot20, predplotaoa)
+grid.arrange(predplot40,predplot20, predplotaoa, ncol = 2)
